@@ -12,9 +12,6 @@
 
 <br>
 
-![Screenshot Aplikasi](https://via.placeholder.com/1200x600.png?text=Screenshot+Aplikasi+Web+Prediksi+Saham)
-*(💡 Ganti link gambar di atas dengan screenshot asli dari website Anda jika ada)*
-
 ---
 
 ## 🌟 Fitur Utama
