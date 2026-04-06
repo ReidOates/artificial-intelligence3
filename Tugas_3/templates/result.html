@@ -1,0 +1,144 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Hasil Prediksi - Regresi Linear</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="/static/style.css">
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f4f7f6; color: #333; }
+        .metric-card {
+            background: white; border-radius: 1rem; border-left: 5px solid #3498db;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.05); padding: 1.5rem; height: 100%; transition: all 0.3s;
+        }
+        .metric-card:hover { transform: translateY(-3px); box-shadow: 0 8px 25px rgba(0,0,0,0.1); }
+        .metric-title { font-size: 0.9rem; color: #7f8c8d; font-weight: 600; text-transform: uppercase; letter-spacing: 1px;}
+        .metric-value { font-size: 2rem; font-weight: 800; color: #2c3e50; }
+        .glass-container { background: white; border-radius: 1.5rem; box-shadow: 0 10px 40px rgba(0,0,0,0.08); padding: 3rem; }
+        .result-box { background: linear-gradient(135deg, #3498db, #2980b9); color: white; border-radius: 1rem; padding: 2rem; text-align: center; }
+        .graph-box { border: 1px solid rgba(0,0,0,0.1); border-radius: 1rem; overflow: hidden; padding: 1rem; background: white; }
+        .btn-outline-primary { border-color: #3498db; color: #3498db; font-weight: 600; padding: 0.75rem 2rem; border-radius: 0.5rem; }
+        .btn-outline-primary:hover { background: #3498db; color: white; }
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+    <div class="glass-container">
+        <div class="d-flex justify-content-between align-items-center mb-4 pb-3 border-bottom">
+            <div>
+                <h2 class="fw-bold mb-0 text-dark"><i class="fa-solid fa-chart-pie text-primary me-2"></i> Laporan Analisis Regresi</h2>
+                <p class="text-muted mb-0 mt-1">Dataset: <strong>{{ filename }}</strong> | Total Data: <strong>{{ result.total_data }} Baris</strong></p>
+            </div>
+            <a href="/" class="btn btn-outline-primary"><i class="fa-solid fa-arrow-left me-2"></i> Kembali</a>
+        </div>
+
+        {% if result.custom_pred %}
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="result-box shadow-lg">
+                    <h5 class="text-white-50 text-uppercase tracking-wider fw-bold">Prediksi Harga Penutupan Terkalkulasi</h5>
+                    <div class="display-3 fw-bold mt-2 mb-3">${{ result.custom_pred }}</div>
+                    <p class="mb-0 fs-5">Berdasarkan Harga Buka (Open) senilai <strong>${{ result.input_open }}</strong></p>
+                </div>
+            </div>
+        </div>
+        {% endif %}
+
+        <h4 class="fw-bold mb-4">Performa Model (Akurasi Metrik)</h4>
+        <div class="row g-4 mb-4">
+            <div class="col-md-4">
+                <div class="metric-card">
+                    <div class="metric-title"><i class="fa-solid fa-circle-check text-success me-2"></i> R-Squared (R²)</div>
+                    <div class="metric-value mt-2">{{ result.r2 }}</div>
+                    <div class="text-muted small mt-1 font-monospace">Detail: {{ result.r2_exact }}</div>
+                    <p class="text-muted small mt-2 mb-0">Skor mendekati 1.0 berarti akurasi prediksi model sangat akurat dan merepresentasikan data asli.</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="metric-card" style="border-left-color: #f1c40f;">
+                    <div class="metric-title"><i class="fa-solid fa-ruler-horizontal text-warning me-2"></i> Mean Absolute Error (MAE)</div>
+                    <div class="metric-value mt-2">{{ result.mae }}</div>
+                    <div class="text-muted small mt-1 font-monospace">Detail: {{ result.mae_exact }}</div>
+                    <p class="text-muted small mt-2 mb-0">Rata-rata kesalahan absolut antara prediksi vs harga aktual penutupan (dalam Dollar $).</p>
+                </div>
+            </div>
+            <div class="col-md-4">
+                <div class="metric-card" style="border-left-color: #e74c3c;">
+                    <div class="metric-title"><i class="fa-solid fa-chart-line text-danger me-2"></i> Mean Squared Error (MSE)</div>
+                    <div class="metric-value mt-2">{{ result.mse }}</div>
+                    <div class="text-muted small mt-1 font-monospace">Detail: {{ result.mse_exact }}</div>
+                    <p class="text-muted small mt-2 mb-0">Semakin kecil lebih baik. MSE menghukum prediksi yang sangat jauh dari data asli.</p>
+                </div>
+            </div>
+        </div>
+
+        <div class="row mb-5">
+            <div class="col-12">
+                <div class="alert alert-info border-0 shadow-sm d-flex align-items-center">
+                    <i class="fa-solid fa-scale-balanced fa-2x me-3 text-info"></i>
+                    <div>
+                        <h6 class="fw-bold mb-1">Validasi Model (Cek Overfitting/Underfitting)</h6>
+                        <span class="small mb-0 text-dark">
+                            <strong>R² Latih (Training):</strong> {{ result.r2_train }} <span class="text-muted font-monospace">({{ result.r2_train_exact }})</span> &nbsp;|&nbsp; 
+                            <strong>R² Uji (Testing):</strong> {{ result.r2 }} <span class="text-muted font-monospace">({{ result.r2_exact }})</span> 
+                            <br><em>Karena nilainya identik/hampir sama dan sangat tinggi, terbukti model saat ini masuk kategori <strong>Good Fit</strong> (Akurat dan Tidak Menghafal).</em>
+                        </span>
+                    </div>
+                </div>
+            </div>
+        </div>
+
+        <h4 class="fw-bold mb-4">Grafik Visualisasi Regresi</h4>
+        <div class="row">
+            <div class="col-12">
+                <div class="graph-box text-center shadow-sm">
+                    <img src="data:image/png;base64,{{ result.plot_url }}" class="img-fluid rounded" alt="Grafik Regresi Linear">
+                    <p class="mt-3 text-muted"><strong>Keterangan:</strong> Garis Merah merepresentasikan model regresi (prediksi), sementara titik Biru adalah harga aktual pasar.</p>
+                </div>
+            </div>
+        </div>
+
+        <h4 class="fw-bold mb-4 mt-5">Tabel Perbandingan (Aktual vs Prediksi)</h4>
+        <div class="row">
+            <div class="col-12">
+                <div class="table-responsive bg-white rounded shadow-sm p-3 border">
+                    <table class="table table-hover align-middle mb-0">
+                        <thead class="table-primary">
+                            <tr>
+                                <th scope="col">Tanggal (Date)</th>
+                                <th scope="col">Harga Buka (X)</th>
+                                <th scope="col">Harga Tutup Aktual (Y)</th>
+                                <th scope="col">Harga Prediksi Model</th>
+                                <th scope="col">Selisih (Absolut)</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for item in result.table_data %}
+                            <tr>
+                                <td>{{ item.date }}</td>
+                                <td>${{ item.open }}</td>
+                                <td class="fw-bold">${{ item.actual_close }}</td>
+                                <td>${{ item.pred_close }}</td>
+                                <td class="{% if (item.actual_close - item.pred_close)|abs > 0.5 %}text-danger{% else %}text-success{% endif %}">
+                                    ${{ "%.2f"|format((item.actual_close - item.pred_close)|abs) }}
+                                </td>
+                            </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            </div>
+        </div>
+
+    </div>
+</div>
+
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

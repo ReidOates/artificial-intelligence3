@@ -1,0 +1,97 @@
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Prediksi Harga Saham | Regresi Linear</title>
+    <!-- Bootstrap 5 CSS -->
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+    <!-- Google Fonts -->
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <!-- Font Awesome -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <!-- Custom CSS -->
+    <link rel="stylesheet" href="{{ url_for('static', filename='css/style.css') }}">
+    <link rel="stylesheet" href="/static/style.css"> <!-- Fallback -->
+    <style>
+        body { font-family: 'Inter', sans-serif; background-color: #f4f7f6; color: #333; }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.85);
+            backdrop-filter: blur(10px);
+            border-radius: 1rem;
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+            padding: 2.5rem;
+            transition: transform 0.3s ease;
+        }
+        .glass-card:hover { transform: translateY(-5px); }
+        .hero-title { font-weight: 800; color: #2c3e50; }
+        .hero-subtitle { color: #7f8c8d; font-weight: 400; margin-bottom: 2rem; }
+        .btn-custom {
+            background-color: #3498db;
+            color: white;
+            font-weight: 600;
+            border-radius: 0.5rem;
+            padding: 0.75rem 2rem;
+            transition: all 0.3s;
+        }
+        .btn-custom:hover { background-color: #2980b9; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(52, 152, 219, 0.3); }
+        .form-label { font-weight: 600; color: #34495e; }
+        .form-control { border-radius: 0.5rem; border: 1px solid #ced4da; padding: 0.75rem 1rem; transition: border-color 0.3s, box-shadow 0.3s; }
+        .form-control:focus { border-color: #3498db; box-shadow: 0 0 0 0.2rem rgba(52, 152, 219, 0.25); }
+    </style>
+</head>
+<body>
+
+<div class="container py-5">
+    <div class="row min-vh-100 align-items-center justify-content-center">
+        <div class="col-lg-8">
+            <div class="text-center mb-5">
+                <i class="fa-solid fa-chart-line fa-4x text-primary mb-3"></i>
+                <h1 class="hero-title">Stock Predictor Pro</h1>
+                <p class="hero-subtitle">Sistem Cerdas Memprediksi Harga Penutupan (Close) berdasarkan Harga Buka (Open) Menggunakan Regresi Linear</p>
+            </div>
+
+            <div class="glass-card">
+                {% if error %}
+                <div class="alert alert-danger" role="alert">
+                    <i class="fa-solid fa-triangle-exclamation me-2"></i> {{ error }}
+                </div>
+                {% endif %}
+
+                <form action="/predict" method="POST" enctype="multipart/form-data">
+                    <div class="row">
+                        <div class="col-md-12 mb-4">
+                            <label for="input_open" class="form-label"><i class="fa-solid fa-dollar-sign me-2"></i> Masukkan Harga Buka (Open Price) Hari Ini:</label>
+                            <input type="number" step="any" class="form-control form-control-lg" id="input_open" name="input_open" placeholder="Contoh: 150.50" required>
+                            <small class="text-muted mt-2 d-block">Sistem akan memprediksi Harga Penutupan berdasarkan histori regresi linear model kami.</small>
+                        </div>
+                        
+                        <div class="col-md-12 mb-4">
+                            <div class="card bg-light border-0">
+                                <div class="card-body">
+                                    <h5 class="card-title fw-bold text-dark"><i class="fa-solid fa-file-csv me-2"></i> Upload Data Saham Tersendiri (Opsional)</h5>
+                                    <p class="card-text text-muted small mb-3">Secara default, sistem menggunakan dataset saham Apple (AAPL). Anda bisa menimpa model ini dengan mengunggah file saham Anda (.txt atau .csv dari folder archive).</p>
+                                    <input class="form-control" type="file" id="file" name="file" accept=".csv, .txt">
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="col-12 mt-4 text-center">
+                            <button type="submit" class="btn btn-custom btn-lg w-100"><i class="fa-solid fa-microchip me-2"></i> Prediksi Sekarang</button>
+                        </div>
+                    </div>
+                </form>
+            </div>
+            
+            <div class="text-center mt-5 text-muted small">
+                Tugas 3 Regresi Linear &copy; 2026 | Dibangun menggunakan Flask & Scikit-learn
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Bootstrap JS -->
+<script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+</body>
+</html>

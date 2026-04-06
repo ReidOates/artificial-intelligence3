@@ -1,0 +1,13 @@
+# Common Python/Flask exclusions
+venv/
+__pycache__/
+.env
+*.pyc
+
+# User requested exclusions
+Tugas_3/CARA_DEPLOY_PYTHONANYWHERE.md
+Tugas_3/CARA_MENJALANKAN_WEB.md
+Tugas_3/jurnal_2_referensi.md
+Tugas_3/jurnal_3_referensi.md
+Tugas_3/jurnal_4_referensi.md
+Tugas_3/laporan_penelitian.md
